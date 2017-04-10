@@ -1,0 +1,135 @@
+
+/* _req does not exist yet for this user! */
+(
+	!data.child('_req').hasChild(auth.uid) && newData.child('_req').hasChild(auth.uid)
+) ||
+
+/* buissness as normal */
+(
+	/* The child of the request must be same as auth id */
+	(
+		newData.child('_req').hasChild(auth.uid)
+	) &&
+
+	/* the new last_request time must be server time */
+	(
+		newData.child('_req').child(auth.uid).child('last_request').val() === now
+	) &&
+
+	(
+
+		/* if expired, request counts of 0 should be added */
+		(
+			newData.child('_req').child(auth.uid).child('last_request').val() > data.child('_req').child(auth.uid).child('last_request').val() + 1000 * 30 &&
+			newData.child('_req').child(auth.uid).child('request_count').val() === 0
+		) ||
+
+		/* if not expired /*
+		(
+			newData.child('_req').child(auth.uid).child('last_request').val() < data.child('_req').child(auth.uid).child('last_request').val() + 1000 * 30 &&
+			newData.child('_req').child(auth.uid).child('request_count').val() < 6 &&
+			newData.child('_req').child(auth.uid).child('request_count').val() === data.child('_req').child(auth.uid).child('request_count').val() + 1
+		)
+		
+	)
+)
+
+simulation: /users/
+
+{
+	"data": {
+		"10102": {
+			"status": "dead",
+			"hunter": "FfbL70x2PBROIqkYTc0ia7agLdI3"
+		}
+	},
+	"_req": {
+		"FfbL70x2PBROIqkYTc0ia7agLdI3": {
+			"last_request": {
+				".sv": "timestamp"
+			},
+			"request_count": 0
+		}
+	}
+}
+
+
+
+{
+	"rules": {
+		"admins": {
+			".read": "auth.uid === root.child('superadmin').val()",
+			".write": "auth.uid === root.child('superadmin').val()",
+		},
+		"superadmin": {
+			".read": "auth.uid === root.child('superadmin').val()",
+			".write": "auth.uid === root.child('superadmin').val()",
+			".validate": "newData.isString()"
+		},	
+		"users": {
+			".write": "true",
+
+
+			"data": {
+				".write": false,
+				"$code": {
+					"status": {
+						".validate": "auth.uid === data.parent().child('hunter').val()"
+					},
+					"$other": {
+						".validate": "false"
+					}
+				}
+			},
+			"_req": {
+
+				"$uid": {
+					".validate": "$uid === auth.uid",
+					"request_count": {
+						".validate": "newData.val() < 6"
+					},
+					"last_request": {
+						".validate": "newData.val() === now"
+					},
+					"$other": {
+						".validate": "false"
+					}
+				}
+
+			},
+
+			".validate": "( !data.child('_req').hasChild(auth.uid) && newData.child('_req').hasChild(auth.uid) ) || ( ( newData.child('_req').hasChild(auth.uid) ) && ( newData.child('_req').child(auth.uid).child('last_request').val() === now ) && ( ( newData.child('_req').child(auth.uid).child('last_request').val() > data.child('_req').child(auth.uid).child('last_request').val() + 1000 * 30 && newData.child('_req').child(auth.uid).child('request_count').val() === 0 ) || ( newData.child('_req').child(auth.uid).child('last_request').val() < data.child('_req').child(auth.uid).child('last_request').val() + 1000 * 30 && newData.child('_req').child(auth.uid).child('request_count').val() < 6 && newData.child('_req').child(auth.uid).child('request_count').val() === data.child('_req').child(auth.uid).child('request_count').val() + 1 ) ) )"
+		}
+	}
+}
+
+
+
+(
+	!data.child('_req').hasChild(auth.uid) && newData.child('_req').hasChild(auth.uid)
+) ||
+
+(
+	(
+		newData.child('_req').hasChild(auth.uid)
+	) &&
+
+	(
+		newData.child('_req').child(auth.uid).child('last_request').val() === now
+	) &&
+
+	(
+
+		(
+			newData.child('_req').child(auth.uid).child('last_request').val() > data.child('_req').child(auth.uid).child('last_request').val() + 1000 * 30 &&
+			newData.child('_req').child(auth.uid).child('request_count').val() === 0
+		) ||
+
+		(
+			newData.child('_req').child(auth.uid).child('last_request').val() < data.child('_req').child(auth.uid).child('last_request').val() + 1000 * 30 &&
+			newData.child('_req').child(auth.uid).child('request_count').val() < 6 &&
+			newData.child('_req').child(auth.uid).child('request_count').val() === data.child('_req').child(auth.uid).child('request_count').val() + 1
+		)
+		
+	)
+)
